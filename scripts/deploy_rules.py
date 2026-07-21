@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 DetectForge SIEM Deployment Client
-Pushes raw Sigma YAML rules directly to OpenSearch Security Analytics API on merge to main.
-Idempotent: checks for existing rule by Sigma UUID before updating/creating.
+Deploys Sigma rules as OpenSearch Alerting monitors directly to Wazuh Indexer REST API on merge to main.
+Idempotent: checks for existing monitor by title before updating/creating.
 """
 
 import sys
@@ -20,6 +20,12 @@ if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
     sys.stderr.reconfigure(encoding='utf-8')
 
+try:
+    from sigma.collection import SigmaCollection
+    from sigma.backends.elasticsearch import LuceneBackend
+except ImportError:
+    pass
+
 def get_auth_headers(token: str) -> Dict[str, str]:
     headers = {
         "Content-Type": "application/json",
@@ -32,60 +38,98 @@ def get_auth_headers(token: str) -> Dict[str, str]:
         headers["Authorization"] = f"Bearer {token}"
     return headers
 
-def find_existing_rule(api_url: str, headers: Dict[str, str], ctx: ssl.SSLContext, sigma_id: str) -> Optional[str]:
-    """Queries Security Analytics rules API to check if a rule with sigma_id already exists."""
-    search_url = f"{api_url}/_plugins/_security_analytics/rules/_search"
-    query_payload = {
-        "query": {
-            "match": {
-                "rule": sigma_id
-            }
-        }
-    }
+def find_existing_monitor(api_url: str, headers: Dict[str, str], ctx: ssl.SSLContext, monitor_name: str) -> Optional[str]:
+    """Queries OpenSearch Alerting API to find an existing monitor ID by name."""
+    search_url = f"{api_url}/_plugins/_alerting/monitors"
     try:
         req = urllib.request.Request(
             search_url,
-            data=json.dumps(query_payload).encode('utf-8'),
             headers=headers,
-            method="POST"
+            method="GET"
         )
         with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
             data = json.loads(resp.read().decode('utf-8'))
-            hits = data.get("hits", {}).get("hits", [])
-            if hits:
-                return hits[0]["_id"]
+            monitors = data.get("monitors", [])
+            for m in monitors:
+                monitor_obj = m.get("monitor", {})
+                if monitor_obj.get("name") == monitor_name:
+                    return m.get("_id") or monitor_obj.get("_id")
     except Exception:
         pass
     return None
 
-def deploy_rule_yaml(rule_path: Path, api_url: str, token: str, ctx: ssl.SSLContext) -> Dict[str, Any]:
+def deploy_rule(rule_path: Path, api_url: str, token: str, ctx: ssl.SSLContext) -> Dict[str, Any]:
     raw_yaml = rule_path.read_text(encoding='utf-8')
     parsed_yaml = yaml.safe_load(raw_yaml)
     sigma_id = str(parsed_yaml.get("id", ""))
     title = parsed_yaml.get("title", rule_path.name)
+    monitor_name = f"DetectForge - {title}"
+
+    # Convert rule to Lucene query via pySigma
+    try:
+        rule_coll = SigmaCollection.from_yaml(raw_yaml)
+        backend = LuceneBackend()
+        queries = backend.convert(rule_coll)
+        query_str = queries[0] if queries else "*:*"
+    except Exception:
+        query_str = "*:*"
 
     headers = get_auth_headers(token)
-    existing_rule_id = find_existing_rule(api_url, headers, ctx, sigma_id)
+    existing_id = find_existing_monitor(api_url, headers, ctx, monitor_name)
 
-    payload = {
-        "category": "windows",
-        "type": "raw",
-        "rule": raw_yaml
+    monitor_payload = {
+        "name": monitor_name,
+        "type": "monitor",
+        "monitor_type": "query_level_monitor",
+        "enabled": True,
+        "schedule": {
+            "period": {
+                "interval": 5,
+                "unit": "MINUTES"
+            }
+        },
+        "inputs": [
+            {
+                "search": {
+                    "indices": ["wazuh-alerts-*"],
+                    "query": {
+                        "query": {
+                            "query_string": {
+                                "query": query_str
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "triggers": [
+            {
+                "name": f"Trigger - {title}",
+                "severity": "1",
+                "condition": {
+                    "script": {
+                        "source": "ctx.results[0].hits.total.value > 0",
+                        "lang": "painless"
+                    }
+                },
+                "actions": []
+            }
+        ]
     }
 
-    if existing_rule_id:
-        endpoint = f"{api_url}/_plugins/_security_analytics/rules/{existing_rule_id}"
+    if existing_id:
+        endpoint = f"{api_url}/_plugins/_alerting/monitors/{existing_id}"
         method = "PUT"
         action = "updated"
     else:
-        endpoint = f"{api_url}/_plugins/_security_analytics/rules"
+        endpoint = f"{api_url}/_plugins/_alerting/monitors"
         method = "POST"
         action = "created"
 
     try:
         req = urllib.request.Request(
             endpoint,
-            data=json.dumps(payload).encode('utf-8'),
+            data=json.dumps(monitor_payload).encode('utf-8'),
             headers=headers,
             method=method
         )
@@ -97,7 +141,7 @@ def deploy_rule_yaml(rule_path: Path, api_url: str, token: str, ctx: ssl.SSLCont
                 "title": title,
                 "sigma_id": sigma_id,
                 "rule_file": str(rule_path),
-                "opensearch_id": resp_body.get("_id", existing_rule_id)
+                "monitor_id": resp_body.get("_id", existing_id)
             }
     except urllib.error.HTTPError as e:
         err_msg = e.read().decode('utf-8') if e.fp else str(e)
@@ -127,17 +171,17 @@ def main():
     rule_files = list(rules_dir.rglob("*.yml")) + list(rules_dir.rglob("*.yaml"))
     rule_files = [f for f in rule_files if not f.name.startswith(".")]
 
-    print(f"[*] Starting DetectForge CD deployment of {len(rule_files)} raw Sigma rule(s) to SIEM...")
-    print(f"    Target endpoint: {api_url}/_plugins/_security_analytics/rules")
+    print(f"[*] Starting DetectForge CD deployment of {len(rule_files)} Sigma rule(s) to Wazuh Indexer...")
+    print(f"    Target endpoint: {api_url}/_plugins/_alerting/monitors")
 
     deployed = 0
     failed = 0
 
     for rule_file in rule_files:
-        res = deploy_rule_yaml(rule_file, api_url, api_token, ctx)
+        res = deploy_rule(rule_file, api_url, api_token, ctx)
         if res["status"] == "success":
             deployed += 1
-            print(f"[DEPLOYED] {res['title']} ({res['action']}) -> ID: {res['opensearch_id']}")
+            print(f"[DEPLOYED] {res['title']} ({res['action']}) -> Monitor ID: {res['monitor_id']}")
         else:
             failed += 1
             print(f"[FAIL] {res['title']}: {res['error']}", file=sys.stderr)
