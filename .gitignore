@@ -1,0 +1,58 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# ===== Environment & Secrets =====
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ===== Docker =====
+lab/data/
+lab/certs/
+lab/config/wazuh_indexer_ssl_certs/
+
+# ===== Build artifacts =====
+build/
+*.log
+
+# ===== Test artifacts =====
+.pytest_cache/
+.coverage
+htmlcov/
+test-results/
+
+# ===== Generated outputs =====
+config/attack_coverage_layer.json
