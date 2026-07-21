@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "name": "DetectForge CD \u2014 Deploy Rules to SIEM",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "commit_message": "feat(cd): update deploy_rules.py to target OpenSearch Alerting API on Wazuh Indexer",
+    "html_url": "https://github.com/anshwhoo/detectforge/actions",
+    "created_at": "2026-07-21T20:53:43Z",
+    "updated_at": "2026-07-21T20:53:50Z"
+  },
+  {
+    "id": 2,
+    "name": "DetectForge CI \u2014 Lint, Convert & Test Rules",
+    "event": "pull_request",
+    "status": "completed",
+    "conclusion": "success",
+    "commit_message": "feat(rules): add T1059.001 PowerShell encoded command Sigma rule and test corpus",
+    "html_url": "https://github.com/anshwhoo/detectforge/actions",
+    "created_at": "2026-07-21T20:30:12Z",
+    "updated_at": "2026-07-21T20:30:30Z"
+  }
+]

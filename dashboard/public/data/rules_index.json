@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Suspicious PowerShell Encoded Command Execution",
+    "id": "c8b31a89-2917-4d92-93d3-0570b5550a18",
+    "level": "high",
+    "tags": [
+      "attack.execution",
+      "attack.t1059.001"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "test",
+    "falsepositives": [
+      "Legitimate administrative automation scripts using base64 encoded parameters."
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_powershell_encoded_command.yml",
+    "description": "Detects execution of PowerShell with an encoded command string, which is commonly used by adversaries to obfuscate malicious commands or scripts.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1059/001/",
+      "https://github.com/OTRF/Security-Datasets"
+    ],
+    "author": "DetectForge Team"
+  }
+]
