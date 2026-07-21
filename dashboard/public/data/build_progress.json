@@ -1,0 +1,52 @@
+[
+  {
+    "phase": 1,
+    "title": "Repository Scaffold & Structure",
+    "status": "complete"
+  },
+  {
+    "phase": 2,
+    "title": "Wazuh SIEM Lab Stack (Docker)",
+    "status": "complete"
+  },
+  {
+    "phase": 3,
+    "title": "Python Environment & pySigma",
+    "status": "complete"
+  },
+  {
+    "phase": 4,
+    "title": "Reference Telemetry Fetcher (OTRF/EVTX)",
+    "status": "complete"
+  },
+  {
+    "phase": 5,
+    "title": "First Sigma Detection Rule (T1059.001)",
+    "status": "complete"
+  },
+  {
+    "phase": 6,
+    "title": "Continuous Integration (CI Workflow)",
+    "status": "complete"
+  },
+  {
+    "phase": 7,
+    "title": "End-to-End CI Regression Gate",
+    "status": "complete"
+  },
+  {
+    "phase": 8,
+    "title": "Branch Protection Rules",
+    "status": "complete"
+  },
+  {
+    "phase": 9,
+    "title": "Continuous Deployment (CD Workflow & Self-Hosted Runner)",
+    "status": "complete"
+  },
+  {
+    "phase": 10,
+    "title": "Operations, ATT&CK Coverage & Web Dashboard",
+    "status": "complete"
+  }
+]

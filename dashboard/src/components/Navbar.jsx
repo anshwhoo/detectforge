@@ -55,7 +55,7 @@ export default function Navbar({ activeTab, setActiveTab, onRefresh, lastUpdated
         <button
           onClick={onRefresh}
           disabled={isRefreshing}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all font-medium disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all font-medium disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
           title="Re-fetch JSON data files"
         >
           <svg

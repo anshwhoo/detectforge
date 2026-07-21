@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { formatDateShort } from '../utils/formatters';
 
 export default function PipelineActivityTab({ runs }) {
   const [filterType, setFilterType] = useState('all');
@@ -26,7 +27,7 @@ export default function PipelineActivityTab({ runs }) {
         <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
           <button
             onClick={() => setFilterType('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               filterType === 'all' ? 'bg-slate-800 text-slate-100 font-semibold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -34,7 +35,7 @@ export default function PipelineActivityTab({ runs }) {
           </button>
           <button
             onClick={() => setFilterType('ci')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               filterType === 'ci' ? 'bg-slate-800 text-emerald-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -42,7 +43,7 @@ export default function PipelineActivityTab({ runs }) {
           </button>
           <button
             onClick={() => setFilterType('cd')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               filterType === 'cd' ? 'bg-slate-800 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -102,7 +103,7 @@ export default function PipelineActivityTab({ runs }) {
 
                 <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
                   <span className="text-xs text-slate-400 font-mono">
-                    {new Date(run.created_at || Date.now()).toLocaleString()}
+                    {formatDateShort(run.created_at)}
                   </span>
 
                   <a

@@ -1,0 +1,20 @@
+{
+  "timestamp": "22-07-2026",
+  "components": {
+    "wazuh_indexer": {
+      "name": "Wazuh Indexer",
+      "endpoint": "https://localhost:9200",
+      "status": "offline"
+    },
+    "wazuh_manager": {
+      "name": "Wazuh Manager",
+      "endpoint": "https://localhost:55000",
+      "status": "offline"
+    },
+    "self_hosted_runner": {
+      "name": "Self-Hosted Runner",
+      "runner_name": "detectforge-local-runner",
+      "status": "online"
+    }
+  }
+}

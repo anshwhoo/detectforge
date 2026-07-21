@@ -5,12 +5,15 @@ import RulesTab from './components/RulesTab';
 import AttackCoverageTab from './components/AttackCoverageTab';
 import PipelineActivityTab from './components/PipelineActivityTab';
 import MonitoringTab from './components/MonitoringTab';
+import { formatTimestamp } from './utils/formatters';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [rules, setRules] = useState([]);
   const [attackLayer, setAttackLayer] = useState({ techniques: [] });
   const [pipelineRuns, setPipelineRuns] = useState([]);
+  const [buildProgress, setBuildProgress] = useState([]);
+  const [systemHealth, setSystemHealth] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState('');
 
@@ -18,17 +21,21 @@ export default function App() {
     setIsRefreshing(true);
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     try {
-      const [rulesRes, layerRes, runsRes] = await Promise.all([
+      const [rulesRes, layerRes, runsRes, buildRes, healthRes] = await Promise.all([
         fetch(`${basePath}/data/rules_index.json?t=${Date.now()}`),
         fetch(`${basePath}/data/attack_coverage_layer.json?t=${Date.now()}`),
-        fetch(`${basePath}/data/pipeline_runs.json?t=${Date.now()}`)
+        fetch(`${basePath}/data/pipeline_runs.json?t=${Date.now()}`),
+        fetch(`${basePath}/data/build_progress.json?t=${Date.now()}`),
+        fetch(`${basePath}/data/system_health.json?t=${Date.now()}`)
       ]);
 
       if (rulesRes.ok) setRules(await rulesRes.json());
       if (layerRes.ok) setAttackLayer(await layerRes.json());
       if (runsRes.ok) setPipelineRuns(await runsRes.json());
+      if (buildRes.ok) setBuildProgress(await buildRes.json());
+      if (healthRes.ok) setSystemHealth(await healthRes.json());
 
-      setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      setLastUpdated(formatTimestamp(new Date()));
     } catch (err) {
       console.error('Failed fetching dashboard data:', err);
     } finally {
@@ -41,7 +48,7 @@ export default function App() {
   }, [loadData]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -56,6 +63,8 @@ export default function App() {
             rules={rules}
             attackLayer={attackLayer}
             runs={pipelineRuns}
+            buildProgress={buildProgress}
+            systemHealth={systemHealth}
             setActiveTab={setActiveTab}
           />
         )}

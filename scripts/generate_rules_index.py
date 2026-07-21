@@ -143,5 +143,13 @@ def main():
         json.dump(runs, f, indent=2)
     print(f"[+] Generated {runs_file} ({len(runs)} runs)")
 
+    # 4. Generate system_health.json
+    try:
+        health_script = BASE_DIR / "scripts" / "generate_system_health.py"
+        if health_script.exists():
+            os.system(f"{sys.executable} {health_script}")
+    except Exception as e:
+        print(f"[!] Warning: Could not run system health generator: {e}", file=sys.stderr)
+
 if __name__ == "__main__":
     main()
