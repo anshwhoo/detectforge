@@ -1,0 +1,3 @@
+{"type":"visualization","id":"detectforge-rule-fires","attributes":{"title":"DetectForge — Rule Fires Per Day","visState":"{\"title\":\"DetectForge — Rule Fires Per Day\",\"type\":\"histogram\",\"params\":{\"addLegend\":true,\"addTooltip\":true}}"}}
+{"type":"visualization","id":"detectforge-fp-rate","attributes":{"title":"DetectForge — False Positive Rate By Rule","visState":"{\"title\":\"DetectForge — False Positive Rate By Rule\",\"type\":\"metric\",\"params\":{\"addLegend\":true,\"addTooltip\":true}}"}}
+{"type":"dashboard","id":"detectforge-rule-health-dashboard","attributes":{"title":"DetectForge Rule Health Dashboard","description":"Monitors rule fires per day, false positive rate per rule, and detection trends."}}
