@@ -1,0 +1,59 @@
+name: "DetectForge CI — Lint, Convert & Test Rules"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'rules/**'
+      - 'tests/**'
+      - 'pipelines/**'
+      - 'scripts/**'
+      - '.github/workflows/ci-test-rules.yml'
+
+jobs:
+  lint-convert-test:
+    runs-on: ubuntu-latest
+
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+        ports:
+          - 9200:9200
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: 'false'
+        options: >-
+          --health-cmd "curl -f http://localhost:9200/_cluster/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 1. Lint Sigma Rules
+        run: python scripts/lint_rules.py
+
+      - name: 2. Convert Rules (pySigma)
+        run: python scripts/convert_rules.py
+
+      - name: 3. Run Test Harness
+        run: python scripts/test_harness.py --es-url http://localhost:9200
+
+      - name: 4. Post PR Report Comment
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/post_pr_comment.py

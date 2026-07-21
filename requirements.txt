@@ -1,0 +1,11 @@
+pysigma>=0.11.0
+pysigma-backend-elasticsearch>=1.1.0
+pysigma-pipeline-sysmon>=1.0.0
+pysigma-pipeline-windows>=1.2.0
+sigma-cli>=1.0.0
+pyyaml>=6.0
+requests>=2.31.0
+jsonschema>=4.20.0
+pytest>=7.4.0
+urllib3>=2.0.0
+python-evtx>=0.7.4
