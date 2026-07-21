@@ -1,6 +1,7 @@
 name: "DetectForge CD — Deploy Rules to SIEM"
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
