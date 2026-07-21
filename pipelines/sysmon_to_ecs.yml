@@ -1,0 +1,16 @@
+name: sysmon_to_ecs
+priority: 10
+transformations:
+  - doc: Field mappings from Sysmon / Windows event logs to Elastic Common Schema (ECS)
+    type: field_name_mapping
+    mapping:
+      Image: process.executable
+      CommandLine: process.command_line
+      CurrentDirectory: process.working_directory
+      User: user.name
+      ParentImage: process.parent.executable
+      ParentCommandLine: process.parent.command_line
+      ParentProcessId: process.parent.pid
+      ProcessId: process.pid
+      IntegrityLevel: process.integrity_level
+      Hashes: process.hash.sha256

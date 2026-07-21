@@ -1,0 +1,8 @@
+# DetectForge Rule-to-Test Mapping Manifest
+rules:
+  - rule: rules/windows/process_creation/proc_creation_win_powershell_encoded_command.yml
+    slug: powershell_encoded_command
+    true_positive:
+      - tests/true_positive/powershell_encoded_command/t1059_001_sample_1.json
+    false_positive:
+      - tests/false_positive/powershell_encoded_command/legitimate_admin_script.json

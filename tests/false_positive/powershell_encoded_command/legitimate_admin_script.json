@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "Legitimate admin script without encoded command parameters"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-07-22T00:20:00.000000Z",
+    "Computer": "WORKSTATION01.CORP.LOCAL",
+    "EventData": {
+      "UtcTime": "2026-07-22 00:20:00.000",
+      "ProcessId": 5120,
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\ProgramData\\SCCM\\scripts\\healthcheck.ps1",
+      "CurrentDirectory": "C:\\Windows\\System32\\",
+      "User": "NT AUTHORITY\\SYSTEM",
+      "IntegrityLevel": "System",
+      "ParentImage": "C:\\Windows\\System32\\services.exe",
+      "ParentCommandLine": "C:\\Windows\\System32\\services.exe"
+    }
+  }
+}

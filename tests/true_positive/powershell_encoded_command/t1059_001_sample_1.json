@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "source": "OTRF-Security-Datasets",
+    "technique_id": "T1059.001",
+    "normalized_by": "DetectForge-FetchReferenceSamples"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-07-22T00:15:30.123456Z",
+    "Computer": "WORKSTATION01.CORP.LOCAL",
+    "Security": {
+      "UserID": "S-1-5-21-123456789-987654321-1001"
+    },
+    "EventData": {
+      "UtcTime": "2026-07-22 00:15:30.123",
+      "ProcessGuid": "{A1234567-89AB-CDEF-0000-001000000000}",
+      "ProcessId": 4820,
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell.exe -NoProfile -NonInteractive -EncodedCommand JABzAD0ATgBlAHcALQBPAGIAagBlAGMAdAAgAEkATwAuAE0AZQBtAG8AcgB5AFNAdAByAGUAYQBtAA==",
+      "CurrentDirectory": "C:\\Users\\victim\\",
+      "User": "CORP\\victim",
+      "LogonGuid": "{A1234567-89AB-CDEF-0000-002000000000}",
+      "LogonId": "0x3e7",
+      "TerminalSessionId": 1,
+      "IntegrityLevel": "Medium",
+      "Hashes": "SHA256=9DB6D0A9491F79A5E81A4384B6F77B08B81559C3C240E8A3EA532C6E87560B0E",
+      "ParentProcessGuid": "{A1234567-89AB-CDEF-0000-001000000001}",
+      "ParentProcessId": 3104,
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe /c start_payload.bat"
+    }
+  }
+}
