@@ -14,6 +14,7 @@ export default function App() {
   const [pipelineRuns, setPipelineRuns] = useState([]);
   const [buildProgress, setBuildProgress] = useState([]);
   const [systemHealth, setSystemHealth] = useState(null);
+  const [coverageHistory, setCoverageHistory] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState('');
 
@@ -21,12 +22,13 @@ export default function App() {
     setIsRefreshing(true);
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     try {
-      const [rulesRes, layerRes, runsRes, buildRes, healthRes] = await Promise.all([
+      const [rulesRes, layerRes, runsRes, buildRes, healthRes, historyRes] = await Promise.all([
         fetch(`${basePath}/data/rules_index.json?t=${Date.now()}`),
         fetch(`${basePath}/data/attack_coverage_layer.json?t=${Date.now()}`),
         fetch(`${basePath}/data/pipeline_runs.json?t=${Date.now()}`),
         fetch(`${basePath}/data/build_progress.json?t=${Date.now()}`),
-        fetch(`${basePath}/data/system_health.json?t=${Date.now()}`)
+        fetch(`${basePath}/data/system_health.json?t=${Date.now()}`),
+        fetch(`${basePath}/data/coverage_history.json?t=${Date.now()}`)
       ]);
 
       if (rulesRes.ok) setRules(await rulesRes.json());
@@ -34,6 +36,7 @@ export default function App() {
       if (runsRes.ok) setPipelineRuns(await runsRes.json());
       if (buildRes.ok) setBuildProgress(await buildRes.json());
       if (healthRes.ok) setSystemHealth(await healthRes.json());
+      if (historyRes.ok) setCoverageHistory(await historyRes.json());
 
       setLastUpdated(formatTimestamp(new Date()));
     } catch (err) {
@@ -43,8 +46,13 @@ export default function App() {
     }
   }, []);
 
+  // Initial load + 30-second live polling interval
   useEffect(() => {
     loadData();
+    const interval = setInterval(() => {
+      loadData();
+    }, 30000);
+    return () => clearInterval(interval);
   }, [loadData]);
 
   return (
@@ -65,6 +73,7 @@ export default function App() {
             runs={pipelineRuns}
             buildProgress={buildProgress}
             systemHealth={systemHealth}
+            coverageHistory={coverageHistory}
             setActiveTab={setActiveTab}
           />
         )}

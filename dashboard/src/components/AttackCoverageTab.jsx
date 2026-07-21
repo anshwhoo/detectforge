@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
 const ENTERPRISE_TACTICS = [
   { id: 'execution', name: 'Execution' },
@@ -43,14 +44,33 @@ export default function AttackCoverageTab({ attackLayer, rules, setActiveTab }) 
   const [hoveredTechnique, setHoveredTechnique] = useState(null);
 
   // Build technique map from attackLayer JSON
-  const layerTechniqueMap = {};
-  (attackLayer?.techniques || []).forEach((t) => {
-    layerTechniqueMap[t.techniqueID] = t;
-  });
+  const layerTechniqueMap = useMemo(() => {
+    const map = {};
+    (attackLayer?.techniques || []).forEach((t) => {
+      map[t.techniqueID] = t;
+    });
+    return map;
+  }, [attackLayer]);
 
   const getTechniqueData = (techId) => {
     return layerTechniqueMap[techId] || { techniqueID: techId, score: 0, color: null, comment: '' };
   };
+
+  // Recharts Bar Chart Data: Rules by Tactic
+  const tacticBarData = useMemo(() => {
+    return ENTERPRISE_TACTICS.map((tactic) => {
+      let count = 0;
+      const techList = SAMPLE_TECHNIQUES[tactic.id] || [];
+      techList.forEach((t) => {
+        const score = layerTechniqueMap[t.id]?.score || 0;
+        count += score;
+      });
+      return {
+        tactic: tactic.name,
+        rulesCount: count
+      };
+    });
+  }, [layerTechniqueMap]);
 
   return (
     <div className="space-y-6">
@@ -65,9 +85,33 @@ export default function AttackCoverageTab({ attackLayer, rules, setActiveTab }) 
         </div>
       </div>
 
+      {/* RECHARTS BAR CHART: Rules by Tactic */}
+      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-lg">
+        <h3 className="text-sm font-bold text-slate-100 mb-1">Rules Deployed by ATT&CK Tactic</h3>
+        <p className="text-xs text-slate-400 mb-4">Total active detection coverage mapped per tactic category</p>
+        <div className="h-48 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={tacticBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <XAxis dataKey="tactic" stroke="#64748b" fontSize={11} tickLine={false} />
+              <YAxis stroke="#64748b" fontSize={11} tickLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '10px', fontSize: '12px' }}
+                cursor={{ fill: 'rgba(51, 65, 85, 0.3)' }}
+              />
+              <Bar dataKey="rulesCount" name="Deployed Rules" radius={[6, 6, 0, 0]}>
+                {tacticBarData.map((entry, index) => (
+                  <Cell key={`bar-${index}`} fill={entry.rulesCount > 0 ? '#10b981' : '#334155'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Heatmap Grid (3 Cols) */}
-        <div className="lg:col-span-3 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm overflow-x-auto">
+        <div className="lg:col-span-3 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm overflow-x-auto shadow-lg">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 min-w-[700px]">
             {ENTERPRISE_TACTICS.map((tactic) => (
               <div key={tactic.id} className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3 flex flex-col gap-2">
@@ -141,14 +185,14 @@ export default function AttackCoverageTab({ attackLayer, rules, setActiveTab }) 
         </div>
 
         {/* Pinned Side Detail Panel (1 Col) */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm">
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-lg">
           {pinnedTechnique ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <span className="text-xs font-bold text-emerald-400 font-mono">{pinnedTechnique.id}</span>
                 <button
                   onClick={() => setPinnedTechnique(null)}
-                  className="text-xs text-slate-400 hover:text-slate-200"
+                  className="text-xs text-slate-400 hover:text-slate-200 cursor-pointer"
                 >
                   ✕ Close
                 </button>
@@ -174,7 +218,7 @@ export default function AttackCoverageTab({ attackLayer, rules, setActiveTab }) 
                         <div className="text-[10px] font-mono text-slate-500">{r.file_path}</div>
                         <button
                           onClick={() => setActiveTab('rules')}
-                          className="mt-2 text-[11px] font-medium text-emerald-400 hover:underline inline-flex items-center gap-1"
+                          className="mt-2 text-[11px] font-medium text-emerald-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
                         >
                           View in Rule Catalog →
                         </button>

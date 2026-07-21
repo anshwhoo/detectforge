@@ -1,6 +1,21 @@
 import React, { useState, useMemo } from 'react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-const SEVERITY_COLORS = {
+const SEVERITY_COLORS_MAP = {
+  informational: '#64748b',
+  low: '#3b82f6',
+  medium: '#f59e0b',
+  high: '#f97316',
+  critical: '#ef4444'
+};
+
+const PLATFORM_COLORS_MAP = {
+  windows: '#3b82f6',
+  linux: '#10b981',
+  other: '#8b5cf6'
+};
+
+const SEVERITY_CLASSES = {
   informational: 'bg-slate-800 text-slate-300 border-slate-700',
   low: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
   medium: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
@@ -8,7 +23,7 @@ const SEVERITY_COLORS = {
   critical: 'bg-rose-500/15 text-rose-400 border-rose-500/30'
 };
 
-const STATUS_COLORS = {
+const STATUS_CLASSES = {
   experimental: 'bg-slate-800 text-slate-400 border-slate-700',
   test: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
   stable: 'bg-teal-500/15 text-teal-300 border-teal-500/30'
@@ -30,12 +45,112 @@ export default function RulesTab({ rules }) {
     });
   }, [rules, searchTerm, severityFilter, statusFilter]);
 
+  // Donut Chart 1 Data: Severity Breakdown
+  const severityChartData = useMemo(() => {
+    const counts = { informational: 0, low: 0, medium: 0, high: 0, critical: 0 };
+    rules.forEach((r) => {
+      const lvl = (r.level || 'medium').toLowerCase();
+      if (counts[lvl] !== undefined) counts[lvl] += 1;
+      else counts.medium += 1;
+    });
+    return Object.entries(counts)
+      .filter(([_, count]) => count > 0)
+      .map(([level, count]) => ({
+        name: level.toUpperCase(),
+        value: count,
+        color: SEVERITY_COLORS_MAP[level] || '#f59e0b'
+      }));
+  }, [rules]);
+
+  // Donut Chart 2 Data: Rules by Platform
+  const platformChartData = useMemo(() => {
+    const counts = { windows: 0, linux: 0, other: 0 };
+    rules.forEach((r) => {
+      const product = (r.logsource?.product || 'windows').toLowerCase();
+      if (product.includes('win')) counts.windows += 1;
+      else if (product.includes('linux')) counts.linux += 1;
+      else counts.other += 1;
+    });
+    return Object.entries(counts)
+      .filter(([_, count]) => count > 0)
+      .map(([platform, count]) => ({
+        name: platform.charAt(0).toUpperCase() + platform.slice(1),
+        value: count,
+        color: PLATFORM_COLORS_MAP[platform] || '#3b82f6'
+      }));
+  }, [rules]);
+
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
   return (
     <div className="space-y-6">
+      {/* RECHARTS DONUT CHARTS ROW */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Severity Donut Chart */}
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-lg flex flex-col justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-100">Rule Severity Breakdown</h3>
+            <p className="text-xs text-slate-400">Distribution of rules by threat severity level</p>
+          </div>
+          <div className="h-56 w-full my-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={severityChartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {severityChartData.map((entry, index) => (
+                    <Cell key={`cell-sev-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '10px', fontSize: '12px' }}
+                />
+                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Platform Donut Chart */}
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-lg flex flex-col justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-100">Rules by Platform</h3>
+            <p className="text-xs text-slate-400">Target operating system breakdown (Windows vs Linux)</p>
+          </div>
+          <div className="h-56 w-full my-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={platformChartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {platformChartData.map((entry, index) => (
+                    <Cell key={`cell-plat-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '10px', fontSize: '12px' }}
+                />
+                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
       {/* Header & Controls */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm flex flex-col md:flex-row gap-4 justify-between items-center">
         <div className="relative w-full md:w-96">
@@ -113,7 +228,7 @@ export default function RulesTab({ rules }) {
                           <div className="text-xs font-mono text-slate-500 mt-0.5">{rule.file_path}</div>
                         </td>
                         <td className="py-4 px-4">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase border ${SEVERITY_COLORS[rule.level] || SEVERITY_COLORS.medium}`}>
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase border ${SEVERITY_CLASSES[rule.level] || SEVERITY_CLASSES.medium}`}>
                             {rule.level}
                           </span>
                         </td>
@@ -127,14 +242,14 @@ export default function RulesTab({ rules }) {
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${STATUS_COLORS[rule.status] || STATUS_COLORS.test}`}>
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${STATUS_CLASSES[rule.status] || STATUS_CLASSES.test}`}>
                             {rule.status}
                           </span>
                         </td>
                         <td className="py-4 px-4 text-right">
                           <button
                             onClick={() => toggleExpand(rule.id)}
-                            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all"
+                            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all cursor-pointer"
                             title="Toggle rule details"
                           >
                             <svg className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { AreaChart, Area, PieChart, Pie, Cell, Tooltip, ResponsiveContainer, CartesianGrid, XAxis } from 'recharts';
 import { formatDateShort } from '../utils/formatters';
 
 export default function PipelineActivityTab({ runs }) {
@@ -14,8 +15,102 @@ export default function PipelineActivityTab({ runs }) {
     });
   }, [runs, filterType]);
 
+  // Calculate CI/CD Pass Rate
+  const passRateStats = useMemo(() => {
+    if (runs.length === 0) return { passPct: 100, passed: 0, total: 0 };
+    const passed = runs.filter((r) => r.conclusion === 'success').length;
+    const total = runs.length;
+    const passPct = Math.round((passed / total) * 100);
+    return { passPct, passed, total };
+  }, [runs]);
+
+  // Recharts Pass Rate Gauge Data
+  const gaugeData = useMemo(() => {
+    return [
+      { name: 'Passed', value: passRateStats.passPct, color: '#10b981' },
+      { name: 'Failed/Other', value: 100 - passRateStats.passPct, color: '#334155' }
+    ];
+  }, [passRateStats]);
+
+  // Recharts Trend Line Data (sparkline per run)
+  const trendData = useMemo(() => {
+    return [...runs].reverse().map((r, i) => ({
+      runNum: `#${i + 1}`,
+      passVal: r.conclusion === 'success' ? 100 : 0,
+      name: r.name
+    }));
+  }, [runs]);
+
   return (
     <div className="space-y-6">
+      {/* RECHARTS PASS RATE GAUGE & TREND ROW */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Gauge Card (1 Col) */}
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-lg flex flex-col items-center justify-between text-center">
+          <div className="w-full text-left">
+            <h3 className="text-sm font-bold text-slate-100">CI/CD Pass Rate</h3>
+            <p className="text-xs text-slate-400">Success rate across recent workflow executions</p>
+          </div>
+
+          <div className="h-44 w-full relative flex items-center justify-center my-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={gaugeData}
+                  cx="50%"
+                  cy="70%"
+                  startAngle={180}
+                  endAngle={0}
+                  innerRadius={60}
+                  outerRadius={85}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {gaugeData.map((entry, index) => (
+                    <Cell key={`gauge-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+              <div className="text-2xl font-black text-slate-100 font-mono">{passRateStats.passPct}%</div>
+              <div className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">Pass Rate</div>
+            </div>
+          </div>
+
+          <div className="text-xs text-slate-400 font-mono">
+            {passRateStats.passed} / {passRateStats.total} runs succeeded
+          </div>
+        </div>
+
+        {/* Trend Area Chart (2 Cols) */}
+        <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm shadow-lg flex flex-col justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-100 mb-1">Execution Status Trend</h3>
+            <p className="text-xs text-slate-400 mb-3">Historical pass/fail status per pipeline run over time</p>
+          </div>
+
+          <div className="h-40 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="passGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="runNum" stroke="#64748b" fontSize={11} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '10px', fontSize: '12px' }}
+                />
+                <Area type="monotone" dataKey="passVal" name="Status %" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#passGradient)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
       {/* Header & Filter Controls */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

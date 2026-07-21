@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { formatTimestamp } from '../utils/formatters';
 
 const SEVERITY_COLORS = {
@@ -9,12 +10,45 @@ const SEVERITY_COLORS = {
   critical: 'bg-rose-500'
 };
 
-export default function OverviewTab({ rules, attackLayer, runs, buildProgress, systemHealth, setActiveTab }) {
+export default function OverviewTab({ rules, attackLayer, runs, buildProgress, systemHealth, coverageHistory, setActiveTab }) {
   const totalRules = rules.length;
   const coveredTechniques = attackLayer?.techniques?.length || 0;
   
   const latestRun = runs.length > 0 ? runs[0] : null;
   const isCiPassing = latestRun ? (latestRun.conclusion === 'success') : true;
+
+  // Animated Count State
+  const [animatedRules, setAnimatedRules] = useState(0);
+  const [animatedTechniques, setAnimatedTechniques] = useState(0);
+
+  useEffect(() => {
+    let rCount = 0;
+    const rTimer = setInterval(() => {
+      rCount += 1;
+      if (rCount >= totalRules) {
+        setAnimatedRules(totalRules);
+        clearInterval(rTimer);
+      } else {
+        setAnimatedRules(rCount);
+      }
+    }, 100);
+
+    let tCount = 0;
+    const tTimer = setInterval(() => {
+      tCount += 1;
+      if (tCount >= coveredTechniques) {
+        setAnimatedTechniques(coveredTechniques);
+        clearInterval(tTimer);
+      } else {
+        setAnimatedTechniques(tCount);
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(rTimer);
+      clearInterval(tTimer);
+    };
+  }, [totalRules, coveredTechniques]);
 
   // Severity counts breakdown
   const severityCounts = {
@@ -42,13 +76,13 @@ export default function OverviewTab({ rules, attackLayer, runs, buildProgress, s
 
   return (
     <div className="space-y-6">
-      {/* 4 STAT CARDS */}
+      {/* 4 STAT CARDS (Animated Count Up) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 relative overflow-hidden backdrop-blur-sm shadow-lg">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400"></div>
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Rules Deployed</div>
-          <div className="text-3xl font-extrabold text-slate-100 my-2 font-mono">{totalRules}</div>
+          <div className="text-3xl font-extrabold text-slate-100 my-2 font-mono transition-all">{animatedRules}</div>
           <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             100% CI Regression Tested
@@ -59,8 +93,8 @@ export default function OverviewTab({ rules, attackLayer, runs, buildProgress, s
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 relative overflow-hidden backdrop-blur-sm shadow-lg">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">ATT&CK Coverage</div>
-          <div className="text-3xl font-extrabold text-slate-100 my-2 font-mono">
-            {coveredTechniques} <span className="text-sm font-normal text-slate-500">/ 201</span>
+          <div className="text-3xl font-extrabold text-slate-100 my-2 font-mono transition-all">
+            {animatedTechniques} <span className="text-sm font-normal text-slate-500">/ 201</span>
           </div>
           <div className="text-xs text-blue-400 font-medium">
             Technique T1059.001 (Execution)
@@ -96,6 +130,41 @@ export default function OverviewTab({ rules, attackLayer, runs, buildProgress, s
         </div>
       </div>
 
+      {/* RECHARTS LINE CHART: ATT&CK Coverage Growth Trend */}
+      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm shadow-lg">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+          <div>
+            <h3 className="text-base font-bold text-slate-100">ATT&CK Technique Coverage Growth Trend</h3>
+            <p className="text-xs text-slate-400">Historical accumulation of covered MITRE ATT&CK techniques over time</p>
+          </div>
+          <div className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+            {coverageHistory?.length || 0} Historical Snapshots
+          </div>
+        </div>
+
+        <div className="h-56 w-full my-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={coverageHistory || []} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
+              <YAxis stroke="#64748b" fontSize={11} tickLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '10px', fontSize: '12px' }}
+              />
+              <Line
+                type="monotone"
+                dataKey="techniques_covered"
+                name="Techniques Covered"
+                stroke="#10b981"
+                strokeWidth={3}
+                dot={{ fill: '#10b981', r: 4 }}
+                activeDot={{ r: 7, fill: '#34d399' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {/* ROW 2: PREVIEWS GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Heatmap Preview Panel */}
@@ -103,7 +172,7 @@ export default function OverviewTab({ rules, attackLayer, runs, buildProgress, s
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-base font-bold text-slate-100">ATT&CK Coverage Heatmap</h3>
+                <h3 className="text-base font-bold text-slate-100">ATT&CK Matrix Preview</h3>
                 <p className="text-xs text-slate-400">Live matrix generated from deployed rule tags</p>
               </div>
               <button
@@ -139,7 +208,6 @@ export default function OverviewTab({ rules, attackLayer, runs, buildProgress, s
               </div>
             </div>
 
-            {/* Step 2 Refinement: Explicit Preview Label */}
             <div className="text-right mt-2">
               <button
                 onClick={() => setActiveTab('coverage')}
