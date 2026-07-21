@@ -13,9 +13,27 @@ export default function Navbar({ activeTab, setActiveTab, onRefresh, lastUpdated
     <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 md:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-3 w-full md:w-auto justify-between">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('overview')}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-emerald-500/20">
-            DF
+          {/* Professional DetectForge Shield & Target Icon */}
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-500/10 group hover:border-emerald-400 transition-all">
+            <svg className="w-6 h-6 text-emerald-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Shield Outline */}
+              <path
+                d="M12 3L4 7V12C4 16.97 7.41 21.5 12 22.5C16.59 21.5 20 16.97 20 12V7L12 3Z"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="opacity-90"
+              />
+              {/* Radar Target Crosshair Center */}
+              <circle cx="12" cy="12" r="3" stroke="#38bdf8" strokeWidth="1.5" />
+              <path d="M12 7V9" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M12 15V17" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M7 12H9" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M15 12H17" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
           </div>
+
           <div>
             <h1 className="text-lg font-bold tracking-tight text-slate-100 flex items-center gap-2">
               DetectForge
