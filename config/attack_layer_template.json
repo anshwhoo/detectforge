@@ -1,0 +1,26 @@
+{
+  "name": "DetectForge Deployed Detection Layer",
+  "versions": {
+    "attack": "14",
+    "navigator": "5.0.0",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Live MITRE ATT&CK coverage map automatically generated from deployed DetectForge Sigma rules.",
+  "filters": {
+    "platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ]
+  },
+  "gradient": {
+    "colors": [
+      "#ffe6e6",
+      "#66ff66",
+      "#00b300"
+    ],
+    "minValue": 0,
+    "maxValue": 5
+  }
+}

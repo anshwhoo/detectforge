@@ -1,0 +1,44 @@
+name: "DetectForge CD — Deploy Rules to SIEM"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'rules/**'
+      - 'config/**'
+
+jobs:
+  deploy-and-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 1. Deploy Sigma Rules to Wazuh / OpenSearch API
+        run: python scripts/deploy_rules.py
+        env:
+          SIEM_API_URL: ${{ secrets.SIEM_API_URL }}
+          SIEM_API_TOKEN: ${{ secrets.SIEM_API_TOKEN }}
+
+      - name: 2. Generate Updated ATT&CK Coverage Layer
+        run: python scripts/generate_attack_layer.py
+
+      - name: 3. Commit & Push Updated ATT&CK Layer
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(cd): update live MITRE ATT&CK coverage layer [skip ci]"
+          file_pattern: "config/attack_coverage_layer.json"

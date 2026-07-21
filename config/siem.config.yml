@@ -1,0 +1,8 @@
+# DetectForge SIEM Backend Configuration
+siem:
+  backend: opensearch_security_analytics
+  api_url: "https://localhost:9200"
+  verify_ssl: false
+  index_pattern: "wazuh-alerts-*"
+  detector_name: "detectforge-windows-detector"
+  default_category: "windows"
