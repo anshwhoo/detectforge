@@ -4,7 +4,7 @@
     "wazuh_indexer": {
       "name": "Wazuh Indexer",
       "endpoint": "https://localhost:9200",
-      "status": "offline"
+      "status": "online"
     },
     "wazuh_manager": {
       "name": "Wazuh Manager",
