@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "source": "test",
+    "sample_type": "boundary_variant",
+    "note": "Boundary test \u2014 checks where the rule's line is drawn, does not replace a real false positive.",
+    "cleared_field": "CommandLine"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\System32\\schtasks.exe",
+      "CommandLine": "schtasks.exe /create /tn EvilTask --benign-boundary-test"
+    }
+  }
+}
