@@ -48,8 +48,20 @@ jobs:
       - name: 2. Generate Updated ATT&CK Coverage Layer
         run: python scripts/generate_attack_layer.py
 
+      # Replaced stefanzweifel/git-auto-commit-action@v5: it shells out internally in a
+      # way that isn't compatible with this Windows self-hosted runner ("Invalid status
+      # code: 127" - command not found). Plain git commands work fine here, as proven by
+      # every manual push/PR done against this runner all session.
       - name: 3. Commit & Push Updated ATT&CK Layer
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore(cd): update live MITRE ATT&CK coverage layer [skip ci]"
-          file_pattern: "config/attack_coverage_layer.json"
+        shell: powershell
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add config/attack_coverage_layer.json
+          $changes = git diff --cached --name-only
+          if ($changes) {
+            git commit -m "chore(cd): update live MITRE ATT&CK coverage layer [skip ci]"
+            git push
+          } else {
+            Write-Output "No changes to ATT&CK coverage layer, skipping commit."
+          }
