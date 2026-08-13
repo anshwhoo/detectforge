@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "source": "DetectForge-Curated-Sample",
+    "technique_id": "T1003.001",
+    "normalized_by": "DetectForge-FetchReferenceSamples",
+    "placeholder": false,
+    "source_ref": "Atomic Red Team T1003.001 test 'Dump LSASS.exe Memory using ProcDump' (GUID 0be2230c-9ab3-4ac2-8826-3199b9a0ebf8) - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.001/T1003.001.md"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-08-12T20:17:51.229000Z",
+    "Computer": "WORKSTATION04.CORP.LOCAL",
+    "Security": {
+      "UserID": "S-1-5-21-123456789-987654321-1003"
+    },
+    "EventData": {
+      "UtcTime": "2026-08-12 20:17:51.229",
+      "ProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000017}",
+      "ProcessId": 6318,
+      "Image": "C:\\Users\\Public\\procdump64.exe",
+      "CommandLine": "procdump64.exe -accepteula -ma lsass.exe C:\\Windows\\Temp\\lsass_dump.dmp",
+      "CurrentDirectory": "C:\\Users\\Public\\",
+      "User": "CORP\\victim2",
+      "LogonGuid": "{B2345678-9ABC-DEF0-0000-002000000011}",
+      "LogonId": "0x4a1",
+      "TerminalSessionId": 1,
+      "IntegrityLevel": "High",
+      "ParentProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000008}",
+      "ParentProcessId": 3388,
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

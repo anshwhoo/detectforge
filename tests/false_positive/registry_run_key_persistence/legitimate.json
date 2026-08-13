@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "IT support querying (not adding to) the Run key while troubleshooting a slow-boot ticket - same registry path as the malicious case, but a read rather than a write"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "reg.exe query \"HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\"",
+      "User": "CORP\\itsupport",
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

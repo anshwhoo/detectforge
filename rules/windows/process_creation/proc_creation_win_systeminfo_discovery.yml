@@ -1,0 +1,22 @@
+title: System Information Discovery via systeminfo.exe
+id: f78ead59-cf2b-49c7-bb25-053da0ff0fc5
+status: experimental
+description: Detects execution of the built-in systeminfo.exe utility, commonly used by adversaries during the discovery phase to profile a compromised host. Note this is an inherently noisy indicator on its own - IT inventory tools and admin scripts also call systeminfo routinely, so this should be correlated with other signals in production rather than alerted on standalone.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1082/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1082/T1082.md
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\systeminfo.exe'
+  condition: selection
+falsepositives:
+  - Legitimate IT inventory, asset-management, and monitoring agents routinely call systeminfo.exe - this rule cannot distinguish that from adversary recon by process creation alone
+level: low
+tags:
+  - attack.discovery
+  - attack.t1082

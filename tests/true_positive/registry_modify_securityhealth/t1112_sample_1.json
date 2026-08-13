@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "source": "DetectForge-Curated-Sample",
+    "technique_id": "T1112",
+    "normalized_by": "DetectForge-FetchReferenceSamples",
+    "placeholder": false,
+    "source_ref": "Atomic Red Team T1112 test 'Modify Registry of Local Machine - cmd' (GUID 282f929a-6bc5-42b8-bd93-960c3ba35afe) - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1112/T1112.md"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-08-12T20:16:30.442000Z",
+    "Computer": "WORKSTATION05.CORP.LOCAL",
+    "Security": {
+      "UserID": "S-1-5-21-123456789-987654321-1004"
+    },
+    "EventData": {
+      "UtcTime": "2026-08-12 20:16:30.442",
+      "ProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000016}",
+      "ProcessId": 6244,
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "reg add HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /t REG_EXPAND_SZ /v SecurityHealth /d calc.exe /f",
+      "CurrentDirectory": "C:\\Users\\victim3\\",
+      "User": "CORP\\victim3",
+      "LogonGuid": "{B2345678-9ABC-DEF0-0000-002000000012}",
+      "LogonId": "0x5b2",
+      "TerminalSessionId": 1,
+      "IntegrityLevel": "High",
+      "ParentProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000007}",
+      "ParentProcessId": 3120,
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

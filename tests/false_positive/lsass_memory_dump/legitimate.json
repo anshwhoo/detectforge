@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "Same tool and dump flag as the malicious case, but targeting winlogon.exe instead of lsass.exe - a legitimate diagnostic capture IT sometimes performs for an unrelated crash investigation"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Tools\\procdump64.exe",
+      "CommandLine": "procdump64.exe -accepteula -ma winlogon.exe C:\\Temp\\winlogon_dump.dmp",
+      "User": "CORP\\itsupport",
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

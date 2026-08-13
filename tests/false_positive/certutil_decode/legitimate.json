@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "Certutil used for its actual intended purpose - hashing a file during a legitimate integrity check, not decoding an encoded payload"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\System32\\certutil.exe",
+      "CommandLine": "certutil.exe -hashfile C:\\Installers\\vendor_update.msi SHA256",
+      "User": "CORP\\itsupport",
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

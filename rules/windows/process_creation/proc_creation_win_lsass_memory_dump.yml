@@ -1,0 +1,24 @@
+title: LSASS Memory Dump via ProcDump-Style Command Line
+id: 2cae0c52-7a3e-4c9c-b50e-bff637e96cdd
+status: experimental
+description: Detects a command line referencing lsass.exe together with a -ma (full memory dump) style flag, consistent with using ProcDump or similar tools to dump LSASS memory for offline credential extraction.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1003/001/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.001/T1003.001.md
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    CommandLine|contains|all:
+      - 'lsass'
+      - '-ma'
+  condition: selection
+falsepositives:
+  - Authorized incident-response or forensic memory captures performed by security staff
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1003.001

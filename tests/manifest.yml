@@ -6,3 +6,63 @@ rules:
       - tests/true_positive/powershell_encoded_command/t1059_001_sample_1.json
     false_positive:
       - tests/false_positive/powershell_encoded_command/legitimate_admin_script.json
+  - rule: rules/windows/process_creation/proc_creation_win_scheduled_task_creation.yml
+    slug: scheduled_task_creation
+    true_positive:
+      - tests/true_positive/scheduled_task_creation/t1053_005_sample_1.json
+    false_positive:
+      - tests/false_positive/scheduled_task_creation/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_cmd_shell_from_explorer.yml
+    slug: cmd_shell_from_explorer
+    true_positive:
+      - tests/true_positive/cmd_shell_from_explorer/t1059_003_sample_1.json
+    false_positive:
+      - tests/false_positive/cmd_shell_from_explorer/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_office_spawn_script_interpreter.yml
+    slug: office_spawn_script_interpreter
+    true_positive:
+      - tests/true_positive/office_spawn_script_interpreter/t1204_002_sample_1.json
+    false_positive:
+      - tests/false_positive/office_spawn_script_interpreter/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_registry_run_key_persistence.yml
+    slug: registry_run_key_persistence
+    true_positive:
+      - tests/true_positive/registry_run_key_persistence/t1547_001_sample_1.json
+    false_positive:
+      - tests/false_positive/registry_run_key_persistence/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_uac_bypass_eventvwr.yml
+    slug: uac_bypass_eventvwr
+    true_positive:
+      - tests/true_positive/uac_bypass_eventvwr/t1548_002_sample_1.json
+    false_positive:
+      - tests/false_positive/uac_bypass_eventvwr/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_certutil_decode.yml
+    slug: certutil_decode
+    true_positive:
+      - tests/true_positive/certutil_decode/t1027_sample_1.json
+    false_positive:
+      - tests/false_positive/certutil_decode/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_registry_modify_securityhealth.yml
+    slug: registry_modify_securityhealth
+    true_positive:
+      - tests/true_positive/registry_modify_securityhealth/t1112_sample_1.json
+    false_positive:
+      - tests/false_positive/registry_modify_securityhealth/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_lsass_memory_dump.yml
+    slug: lsass_memory_dump
+    true_positive:
+      - tests/true_positive/lsass_memory_dump/t1003_001_sample_1.json
+    false_positive:
+      - tests/false_positive/lsass_memory_dump/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_systeminfo_discovery.yml
+    slug: systeminfo_discovery
+    true_positive:
+      - tests/true_positive/systeminfo_discovery/t1082_sample_1.json
+    false_positive:
+      - tests/false_positive/systeminfo_discovery/legitimate.json
+  - rule: rules/windows/process_creation/proc_creation_win_rdp_to_domain_controller.yml
+    slug: rdp_to_domain_controller
+    true_positive:
+      - tests/true_positive/rdp_to_domain_controller/t1021_001_sample_1.json
+    false_positive:
+      - tests/false_positive/rdp_to_domain_controller/legitimate.json

@@ -1,0 +1,25 @@
+title: Persistence via Registry Run Key Addition
+id: 52c4f0e6-f322-4bb1-ae61-68b86bdabd64
+status: experimental
+description: Detects use of reg.exe to add a new value under the CurrentVersion\Run registry key, a common technique for establishing autostart persistence.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1547/001/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1547.001/T1547.001.md
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\reg.exe'
+    CommandLine|contains|all:
+      - 'add'
+      - 'CurrentVersion\Run'
+  condition: selection
+falsepositives:
+  - Legitimate software installers registering an autostart entry for a user-approved application
+level: medium
+tags:
+  - attack.persistence
+  - attack.t1547.001

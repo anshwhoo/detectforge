@@ -1,0 +1,24 @@
+title: Suspicious Command Shell Invocation Directly From Explorer
+id: 319f9abc-4654-4139-95ba-34007fee33cc
+status: experimental
+description: Detects cmd.exe launched directly by explorer.exe with a /c command chain, which is unusual since a normal double-click open of Command Prompt starts an interactive shell with no arguments.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1059/003/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1059.003/T1059.003.md
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\cmd.exe'
+    ParentImage|endswith: '\explorer.exe'
+    CommandLine|contains: '/c '
+  condition: selection
+falsepositives:
+  - Power users who manually type chained commands into an already-open shell (rare from Explorer specifically)
+level: medium
+tags:
+  - attack.execution
+  - attack.t1059.003

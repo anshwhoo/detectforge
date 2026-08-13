@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "source": "DetectForge-Curated-Sample",
+    "technique_id": "T1082",
+    "normalized_by": "DetectForge-FetchReferenceSamples",
+    "placeholder": false,
+    "source_ref": "Atomic Red Team T1082 test 'System Information Discovery' (GUID 66703791-c902-4560-8770-42b8a91f7667) - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1082/T1082.md"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-08-12T20:18:14.017000Z",
+    "Computer": "WORKSTATION03.CORP.LOCAL",
+    "Security": {
+      "UserID": "S-1-5-21-123456789-987654321-1002"
+    },
+    "EventData": {
+      "UtcTime": "2026-08-12 20:18:14.017",
+      "ProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000018}",
+      "ProcessId": 5996,
+      "Image": "C:\\Windows\\System32\\systeminfo.exe",
+      "CommandLine": "systeminfo.exe",
+      "CurrentDirectory": "C:\\Users\\victim\\",
+      "User": "CORP\\victim",
+      "LogonGuid": "{B2345678-9ABC-DEF0-0000-002000000010}",
+      "LogonId": "0x3e7",
+      "TerminalSessionId": 1,
+      "IntegrityLevel": "Medium",
+      "ParentProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000009}",
+      "ParentProcessId": 4412,
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}
