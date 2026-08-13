@@ -39,21 +39,30 @@ def get_auth_headers(token: str) -> Dict[str, str]:
     return headers
 
 def find_existing_monitor(api_url: str, headers: Dict[str, str], ctx: ssl.SSLContext, monitor_name: str) -> Optional[str]:
-    """Queries OpenSearch Alerting API to find an existing monitor ID by name."""
-    search_url = f"{api_url}/_plugins/_alerting/monitors"
+    """Queries OpenSearch Alerting API to find an existing monitor ID by name.
+
+    Two bugs used to make this always return None (so every deploy created a fresh
+    duplicate monitor instead of updating the existing one, silently, because the
+    failure was swallowed by a bare except): the URL was missing the required /_search
+    suffix, and the request was a bodyless GET when this endpoint requires a POST with
+    a query body.
+    """
+    search_url = f"{api_url}/_plugins/_alerting/monitors/_search"
+    body = json.dumps({"query": {"match_all": {}}, "size": 1000}).encode('utf-8')
     try:
         req = urllib.request.Request(
             search_url,
+            data=body,
             headers=headers,
-            method="GET"
+            method="POST"
         )
         with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
             data = json.loads(resp.read().decode('utf-8'))
-            monitors = data.get("monitors", [])
-            for m in monitors:
-                monitor_obj = m.get("monitor", {})
+            hits = data.get("hits", {}).get("hits", [])
+            for hit in hits:
+                monitor_obj = hit.get("_source", {})
                 if monitor_obj.get("name") == monitor_name:
-                    return m.get("_id") or monitor_obj.get("_id")
+                    return hit.get("_id")
     except Exception:
         pass
     return None
