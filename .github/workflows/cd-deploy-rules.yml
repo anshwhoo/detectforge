@@ -18,17 +18,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Pinned to 3.13 instead of 3.11/3.12: 3.11 isn't installed on this self-hosted
-      # runner and 3.11's setup-python MSI install fails here (registry/installer issues).
-      # 3.12 IS installed but its ctypes module is corrupted on this machine (_SimpleCData
-      # doesn't work), which silently hangs any step that imports it - almost certainly
-      # what caused the CD job to hang indefinitely on "Set up Python 3.12" earlier. 3.13
-      # is confirmed working cleanly on this machine.
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          cache: 'pip'
+      # actions/setup-python@v5's own install step is what's unstable on this self-hosted
+      # runner - confirmed across three attempts (3.11, 3.12, 3.13) that the crash isn't
+      # tied to a specific Python version, it's the action's download/install mechanism
+      # itself hanging and taking the whole runner process down with it. Skipping the
+      # action entirely and pointing PATH at the Python 3.13 already confirmed working
+      # standalone on this machine avoids that install step altogether.
+      - name: Use local Python 3.13
+        shell: pwsh
+        run: |
+          $pythonDir = "C:\Users\ANSHUMAN ROY\AppData\Local\Programs\Python\Python313"
+          if (-not (Test-Path "$pythonDir\python.exe")) {
+            throw "Python 3.13 not found at $pythonDir - update this path if it moves"
+          }
+          echo $pythonDir >> $env:GITHUB_PATH
+          echo "$pythonDir\Scripts" >> $env:GITHUB_PATH
 
       - name: Install Python Dependencies
         run: |
