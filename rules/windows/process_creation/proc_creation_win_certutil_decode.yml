@@ -1,0 +1,22 @@
+title: Certutil Used to Decode a Base64 Encoded File
+id: 728bdd79-66cd-4049-ae7c-0504a4f5ad1d
+status: experimental
+description: Detects use of the built-in certutil.exe LOLBin with the -decode flag, a well-known technique for reconstructing an encoded payload on disk while evading naive AV signature checks.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1027/
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\certutil.exe'
+    CommandLine|contains: '-decode'
+  condition: selection
+falsepositives:
+  - Certutil's legitimate certificate-management usage does not use -decode, so false positives from normal PKI operations are unlikely
+level: high
+tags:
+  - attack.defense_evasion
+  - attack.t1027

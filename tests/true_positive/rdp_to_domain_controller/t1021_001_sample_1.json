@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "source": "DetectForge-Curated-Sample",
+    "technique_id": "T1021.001",
+    "normalized_by": "DetectForge-FetchReferenceSamples",
+    "placeholder": false,
+    "source_ref": "Atomic Red Team T1021.001 test 'RDP to DomainController' (GUID 355d4632-8cb9-449d-91ce-b566d0253d3e) - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1021.001/T1021.001.md"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-08-12T20:19:37.905000Z",
+    "Computer": "WORKSTATION04.CORP.LOCAL",
+    "Security": {
+      "UserID": "S-1-5-21-123456789-987654321-1003"
+    },
+    "EventData": {
+      "UtcTime": "2026-08-12 20:19:37.905",
+      "ProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000019}",
+      "ProcessId": 6402,
+      "Image": "C:\\Windows\\System32\\mstsc.exe",
+      "CommandLine": "mstsc.exe /v:dc01.corp.local",
+      "CurrentDirectory": "C:\\Users\\victim2\\",
+      "User": "CORP\\victim2",
+      "LogonGuid": "{B2345678-9ABC-DEF0-0000-002000000011}",
+      "LogonId": "0x4a1",
+      "TerminalSessionId": 1,
+      "IntegrityLevel": "Medium",
+      "ParentProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000008}",
+      "ParentProcessId": 3388,
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

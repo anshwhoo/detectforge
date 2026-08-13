@@ -1,0 +1,31 @@
+title: Office Application Spawning Script Interpreter
+id: 94d998de-f355-4234-bd78-5a4f33501493
+status: experimental
+description: Detects a Microsoft Office application (Word, Excel, PowerPoint) spawning a script interpreter or shell, commonly seen in malicious macro execution chains such as the OSTap/TrickBot downloader pattern.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1204/002/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1204.002/T1204.002.md
+  - https://www.computerweekly.com/news/252470091/TrickBot-Trojan-switches-to-stealthy-Ostap-downloader
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    ParentImage|endswith:
+      - '\WINWORD.EXE'
+      - '\EXCEL.EXE'
+      - '\POWERPNT.EXE'
+    Image|endswith:
+      - '\wscript.exe'
+      - '\cscript.exe'
+      - '\powershell.exe'
+      - '\cmd.exe'
+  condition: selection
+falsepositives:
+  - Legitimate internally-developed mail-merge or document-automation macros that intentionally invoke a script engine (rare, should be allowlisted by specific script path)
+level: high
+tags:
+  - attack.execution
+  - attack.t1204.002

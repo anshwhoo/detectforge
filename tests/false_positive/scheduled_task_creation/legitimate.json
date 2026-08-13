@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "Legitimate scheduled task query, not a creation - should not trigger a rule looking for /create"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\System32\\schtasks.exe",
+      "CommandLine": "schtasks.exe /query /fo LIST /v",
+      "User": "NT AUTHORITY\\SYSTEM",
+      "ParentImage": "C:\\Windows\\System32\\svchost.exe",
+      "ParentCommandLine": "svchost.exe -k netsvcs"
+    }
+  }
+}

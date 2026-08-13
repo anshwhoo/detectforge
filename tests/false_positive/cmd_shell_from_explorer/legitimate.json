@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "User double-clicking Command Prompt from the Start Menu - plain interactive shell with no /c chain, launched by explorer.exe like the malicious case but without the scripted-command pattern"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\System32\\cmd.exe",
+      "CommandLine": "C:\\Windows\\system32\\cmd.exe",
+      "User": "CORP\\victim",
+      "ParentImage": "C:\\Windows\\explorer.exe",
+      "ParentCommandLine": "C:\\Windows\\Explorer.EXE"
+    }
+  }
+}

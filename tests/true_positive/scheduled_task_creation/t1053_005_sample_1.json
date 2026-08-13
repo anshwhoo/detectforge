@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "source": "DetectForge-Curated-Sample",
+    "technique_id": "T1053.005",
+    "normalized_by": "DetectForge-FetchReferenceSamples",
+    "placeholder": false,
+    "source_ref": "Atomic Red Team T1053.005 test 'Scheduled task Local' (GUID 42f53695-ad4a-4546-abb6-7d837f644a71) - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1053.005/T1053.005.md"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-08-12T20:10:04.418000Z",
+    "Computer": "WORKSTATION03.CORP.LOCAL",
+    "Security": {
+      "UserID": "S-1-5-21-123456789-987654321-1002"
+    },
+    "EventData": {
+      "UtcTime": "2026-08-12 20:10:04.418",
+      "ProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000010}",
+      "ProcessId": 5896,
+      "Image": "C:\\Windows\\System32\\schtasks.exe",
+      "CommandLine": "schtasks.exe /Create /SC ONCE /TN spawn /TR C:\\windows\\system32\\cmd.exe /ST 20:10",
+      "CurrentDirectory": "C:\\Users\\victim\\",
+      "User": "CORP\\victim",
+      "LogonGuid": "{B2345678-9ABC-DEF0-0000-002000000010}",
+      "LogonId": "0x3e7",
+      "TerminalSessionId": 1,
+      "IntegrityLevel": "Medium",
+      "ParentProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000009}",
+      "ParentProcessId": 4412,
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

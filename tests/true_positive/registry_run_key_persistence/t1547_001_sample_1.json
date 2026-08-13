@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "source": "DetectForge-Curated-Sample",
+    "technique_id": "T1547.001",
+    "normalized_by": "DetectForge-FetchReferenceSamples",
+    "placeholder": false,
+    "source_ref": "Atomic Red Team T1547.001 test 'Reg Key Run' (GUID e55be3fd-3521-4610-9d1a-e210e42dcf05) - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1547.001/T1547.001.md"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Provider_Name": "Microsoft-Windows-Sysmon",
+    "TimeCreated": "2026-08-12T20:13:45.552000Z",
+    "Computer": "WORKSTATION03.CORP.LOCAL",
+    "Security": {
+      "UserID": "S-1-5-21-123456789-987654321-1002"
+    },
+    "EventData": {
+      "UtcTime": "2026-08-12 20:13:45.552",
+      "ProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000013}",
+      "ProcessId": 5934,
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "REG ADD \"HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\" /V \"Atomic Red Team\" /t REG_SZ /F /D \"C:\\Path\\AtomicRedTeam.exe\"",
+      "CurrentDirectory": "C:\\Users\\victim\\",
+      "User": "CORP\\victim",
+      "LogonGuid": "{B2345678-9ABC-DEF0-0000-002000000010}",
+      "LogonId": "0x3e7",
+      "TerminalSessionId": 1,
+      "IntegrityLevel": "Medium",
+      "ParentProcessGuid": "{B2345678-9ABC-DEF0-0000-001000000009}",
+      "ParentProcessId": 4412,
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+      "ParentCommandLine": "cmd.exe"
+    }
+  }
+}

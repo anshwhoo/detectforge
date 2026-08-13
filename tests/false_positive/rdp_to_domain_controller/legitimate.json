@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "A user RDPing into a regular file server for routine work - same tool as the malicious case, but the target hostname doesn't match the domain-controller naming pattern this rule watches for"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\System32\\mstsc.exe",
+      "CommandLine": "mstsc.exe /v:fileserver01.corp.local",
+      "User": "CORP\\victim",
+      "ParentImage": "C:\\Windows\\explorer.exe",
+      "ParentCommandLine": "C:\\Windows\\Explorer.EXE"
+    }
+  }
+}

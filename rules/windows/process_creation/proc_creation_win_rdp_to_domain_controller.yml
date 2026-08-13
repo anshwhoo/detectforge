@@ -1,0 +1,23 @@
+title: RDP Client Launched Against a Domain Controller
+id: f3c01f54-da95-4630-b5ec-041185eddff8
+status: experimental
+description: Detects mstsc.exe (Remote Desktop client) launched with a target hostname matching common domain-controller naming conventions, which is unusual for a regular workstation user and may indicate lateral movement toward high-value infrastructure.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1021/001/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1021.001/T1021.001.md
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\mstsc.exe'
+    CommandLine|contains: 'dc0'
+  condition: selection
+falsepositives:
+  - Domain administrators and IT staff legitimately RDP into domain controllers for routine maintenance - tune the hostname pattern to your environment's actual DC naming convention and consider allowlisting known admin accounts
+level: medium
+tags:
+  - attack.lateral_movement
+  - attack.t1021.001

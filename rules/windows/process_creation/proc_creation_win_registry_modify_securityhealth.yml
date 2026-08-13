@@ -1,0 +1,25 @@
+title: Registry Modification of SecurityHealth Startup Entry
+id: ab1a307b-d5a7-436d-93c2-914afa94a8fa
+status: experimental
+description: Detects reg.exe adding a value to the SecurityHealth autostart entry, which attackers abuse to replace the Windows Security notification binary with an arbitrary executable.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1112/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1112/T1112.md
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\reg.exe'
+    CommandLine|contains|all:
+      - 'add'
+      - 'SecurityHealth'
+  condition: selection
+falsepositives:
+  - None expected - legitimate software has no reason to modify this specific value
+level: high
+tags:
+  - attack.defense_evasion
+  - attack.t1112

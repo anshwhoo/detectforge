@@ -1,0 +1,25 @@
+title: UAC Bypass via Event Viewer Registry Hijack
+id: 0fcd46fe-a930-48da-be89-c58604f869aa
+status: experimental
+description: Detects the classic fileless UAC bypass technique that hijacks the mscfile registry class handler (used by eventvwr.msc) to launch an attacker-controlled binary with elevated privileges.
+author: DetectForge Team
+date: 2026/08/12
+references:
+  - https://attack.mitre.org/techniques/T1548/002/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1548.002/T1548.002.md
+  - https://enigma0x3.net/2016/08/15/fileless-uac-bypass-using-eventvwr-exe-and-registry-hijacking/
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\reg.exe'
+    CommandLine|contains: 'mscfile\shell\open\command'
+  condition: selection
+falsepositives:
+  - Legitimate registry management tooling that happens to touch the mscfile class (extremely rare)
+level: high
+tags:
+  - attack.privilege_escalation
+  - attack.defense_evasion
+  - attack.t1548.002

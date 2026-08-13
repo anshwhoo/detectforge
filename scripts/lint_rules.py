@@ -79,6 +79,21 @@ def main():
         else:
             print(f"[PASS] {rule_file}")
 
+    # Check manifest.yml for mandatory false-positive samples vs boundary variants
+    manifest_path = Path("tests/manifest.yml")
+    if manifest_path.exists():
+        try:
+            m_data = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+            if isinstance(m_data, dict) and "rules" in m_data:
+                for entry in m_data.get("rules", []):
+                    slug = entry.get("slug")
+                    fp_list = entry.get("false_positive", [])
+                    real_fps = [f for f in fp_list if "boundary_variants" not in f]
+                    if not real_fps:
+                        print(f"[WARN] Rule '{slug}': Missing mandatory false-positive sample in tests/false_positive/. Boundary tests alone won't pass CI.")
+        except Exception:
+            pass
+
     if total_errors > 0:
         print(f"\n[!] Linting failed with {total_errors} total error(s).", file=sys.stderr)
         sys.exit(1)

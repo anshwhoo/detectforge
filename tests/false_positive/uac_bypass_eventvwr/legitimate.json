@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "An unrelated legitimate reg.exe write to an application's own settings key - never touches the mscfile class handler this rule is watching for"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "reg.exe add \"HKCU\\Software\\Contoso\\AppSettings\" /v Theme /t REG_SZ /d Dark /f",
+      "User": "CORP\\victim",
+      "ParentImage": "C:\\Program Files\\Contoso\\ContosoApp.exe",
+      "ParentCommandLine": "\"C:\\Program Files\\Contoso\\ContosoApp.exe\""
+    }
+  }
+}

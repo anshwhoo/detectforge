@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "Unrelated ordinary activity (opening Notepad) used as a baseline negative test. Note: this rule genuinely cannot distinguish a malicious recon run of systeminfo.exe from a legitimate IT inventory script calling the same binary - see the rule's falsepositives field. This sample only proves the rule stays quiet on unrelated activity, not that it can tell attacker recon apart from routine IT tooling."
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\System32\\notepad.exe",
+      "CommandLine": "\"C:\\Windows\\System32\\notepad.exe\"",
+      "User": "CORP\\victim",
+      "ParentImage": "C:\\Windows\\explorer.exe",
+      "ParentCommandLine": "C:\\Windows\\Explorer.EXE"
+    }
+  }
+}

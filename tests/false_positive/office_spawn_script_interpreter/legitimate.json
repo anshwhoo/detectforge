@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "source": "Hand-crafted",
+    "description": "Word spawning the standard print subsystem helper when a user prints a document - a routine Office child process outside the script-interpreter image list this rule watches for"
+  },
+  "event": {
+    "EventID": 1,
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "EventData": {
+      "Image": "C:\\Windows\\splwow64.exe",
+      "CommandLine": "splwow64.exe 12345",
+      "User": "CORP\\victim",
+      "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+      "ParentCommandLine": "\"C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE\" quarterly_report.docx"
+    }
+  }
+}
