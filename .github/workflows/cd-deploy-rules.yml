@@ -18,10 +18,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python 3.11
+      # Pinned to 3.12 instead of 3.11: actions/setup-python's Windows MSI install path
+      # fails on this self-hosted runner for 3.11 (registry/installer issues), while 3.12
+      # is already present on the runner machine and installs cleanly.
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
           cache: 'pip'
 
       - name: Install Python Dependencies
