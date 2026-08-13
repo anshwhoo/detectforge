@@ -160,8 +160,11 @@ def deploy_rule(rule_path: Path, api_url: str, token: str, ctx: ssl.SSLContext) 
         }
 
 def main():
-    api_url = os.environ.get("SIEM_API_URL", "https://localhost:9200").rstrip("/")
-    api_token = os.environ.get("SIEM_API_TOKEN", "admin:SecretPassword")
+    # os.environ.get(key, default) only falls back when the key is entirely absent - not
+    # when a workflow sets it to an empty string (e.g. `${{ secrets.SIEM_API_URL }}` when
+    # that secret was never configured). Use `or` so an empty value falls back too.
+    api_url = (os.environ.get("SIEM_API_URL") or "https://localhost:9200").rstrip("/")
+    api_token = os.environ.get("SIEM_API_TOKEN") or "admin:SecretPassword"
 
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
@@ -187,7 +190,7 @@ def main():
             print(f"[FAIL] {res['title']}: {res['error']}", file=sys.stderr)
 
     print(f"\n[+] Deployment finished: {deployed} deployed successfully, {failed} failed.")
-    if failed > 0 and os.environ.get("STRICT_DEPLOY") == "1":
+    if failed > 0:
         sys.exit(1)
 
 if __name__ == "__main__":
