@@ -18,13 +18,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Pinned to 3.12 instead of 3.11: actions/setup-python's Windows MSI install path
-      # fails on this self-hosted runner for 3.11 (registry/installer issues), while 3.12
-      # is already present on the runner machine and installs cleanly.
-      - name: Set up Python 3.12
+      # Pinned to 3.13 instead of 3.11/3.12: 3.11 isn't installed on this self-hosted
+      # runner and 3.11's setup-python MSI install fails here (registry/installer issues).
+      # 3.12 IS installed but its ctypes module is corrupted on this machine (_SimpleCData
+      # doesn't work), which silently hangs any step that imports it - almost certainly
+      # what caused the CD job to hang indefinitely on "Set up Python 3.12" earlier. 3.13
+      # is confirmed working cleanly on this machine.
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
           cache: 'pip'
 
       - name: Install Python Dependencies
