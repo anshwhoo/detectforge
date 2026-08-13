@@ -8,6 +8,12 @@ on:
       - 'rules/**'
       - 'config/**'
 
+# Repo default GITHUB_TOKEN permissions are read-only, so the commit step's git push
+# was rejected with 403 even after the git-add-ignored-file fix got the commit itself
+# working. This grants write access to repo contents for this workflow's token only.
+permissions:
+  contents: write
+
 jobs:
   deploy-and-tag:
     runs-on: self-hosted
