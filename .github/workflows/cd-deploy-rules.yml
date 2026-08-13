@@ -25,7 +25,7 @@ jobs:
       # action entirely and pointing PATH at the Python 3.13 already confirmed working
       # standalone on this machine avoids that install step altogether.
       - name: Use local Python 3.13
-        shell: pwsh
+        shell: powershell
         run: |
           $pythonDir = "C:\Users\ANSHUMAN ROY\AppData\Local\Programs\Python\Python313"
           if (-not (Test-Path "$pythonDir\python.exe")) {
