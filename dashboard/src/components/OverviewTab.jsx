@@ -10,9 +10,29 @@ const SEVERITY_COLORS = {
   critical: 'bg-rose-500'
 };
 
+// The five tactics shown in the Overview's condensed preview - a subset of the full
+// heatmap on the ATT&CK Coverage tab, matched by tag against actually-deployed rules.
+const PREVIEW_TACTICS = [
+  { label: 'Execution', tag: 'attack.execution' },
+  { label: 'Persistence', tag: 'attack.persistence' },
+  { label: 'Priv Escalation', tag: 'attack.privilege_escalation' },
+  { label: 'Defense Evasion', tag: 'attack.defense_evasion' },
+  { label: 'Cred Access', tag: 'attack.credential_access' }
+];
+
 export default function OverviewTab({ rules, attackLayer, runs, buildProgress, systemHealth, coverageHistory, setActiveTab }) {
   const totalRules = rules.length;
   const coveredTechniques = attackLayer?.techniques?.length || 0;
+
+  const previewTactics = PREVIEW_TACTICS.map(({ label, tag }) => {
+    const matchingRule = rules.find((r) => r.tags?.includes(tag));
+    const techniqueTag = matchingRule?.tags?.find((t) => /^attack\.t\d{4}(\.\d{3})?$/i.test(t));
+    return {
+      label,
+      covered: !!matchingRule,
+      techniqueId: techniqueTag ? techniqueTag.replace('attack.', '').toUpperCase() : null
+    };
+  });
   
   const latestRun = runs.length > 0 ? runs[0] : null;
   const isCiPassing = latestRun ? (latestRun.conclusion === 'success') : true;
@@ -184,28 +204,21 @@ export default function OverviewTab({ rules, attackLayer, runs, buildProgress, s
             </div>
 
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 my-4">
-              <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-center">
-                <div className="text-[10px] text-slate-500 uppercase font-semibold">Execution</div>
-                <div className="mt-1 text-xs font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-500/40 rounded py-1 font-mono">
-                  T1059.001
+              {previewTactics.map((t) => (
+                <div
+                  key={t.label}
+                  className={`p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-center ${t.covered ? '' : 'opacity-60'}`}
+                >
+                  <div className="text-[10px] text-slate-500 uppercase font-semibold">{t.label}</div>
+                  {t.covered ? (
+                    <div className="mt-1 text-xs font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-500/40 rounded py-1 font-mono">
+                      {t.techniqueId}
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-xs text-slate-600 font-mono py-1">-</div>
+                  )}
                 </div>
-              </div>
-              <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-center opacity-60">
-                <div className="text-[10px] text-slate-500 uppercase font-semibold">Persistence</div>
-                <div className="mt-1 text-xs text-slate-600 font-mono py-1">-</div>
-              </div>
-              <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-center opacity-60">
-                <div className="text-[10px] text-slate-500 uppercase font-semibold">Priv Escalation</div>
-                <div className="mt-1 text-xs text-slate-600 font-mono py-1">-</div>
-              </div>
-              <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-center opacity-60">
-                <div className="text-[10px] text-slate-500 uppercase font-semibold">Defense Evasion</div>
-                <div className="mt-1 text-xs text-slate-600 font-mono py-1">-</div>
-              </div>
-              <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-center opacity-60">
-                <div className="text-[10px] text-slate-500 uppercase font-semibold">Cred Access</div>
-                <div className="mt-1 text-xs text-slate-600 font-mono py-1">-</div>
-              </div>
+              ))}
             </div>
 
             <div className="text-right mt-2">
