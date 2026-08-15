@@ -87,7 +87,11 @@ jobs:
 
           $branch = "chore/coverage-layer-$(Get-Date -Format 'yyyyMMddHHmmss')"
           git checkout -b $branch
-          git commit -m "chore(cd): update live MITRE ATT&CK coverage layer [skip ci]"
+          # No [skip ci] here on purpose: this push needs to trigger deploy-dashboard.yml
+          # (which watches config/**) so the public dashboard picks up the new coverage
+          # data. [skip ci] is a GitHub-wide directive that suppresses EVERY workflow
+          # triggered by a commit, not just one - it was silently blocking that rebuild.
+          git commit -m "chore(cd): update live MITRE ATT&CK coverage layer"
           git remote set-url origin "https://x-access-token:$($env:GH_TOKEN)@github.com/anshwhoo/detectforge.git"
           git push -u origin $branch
 
