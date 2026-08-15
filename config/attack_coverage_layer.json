@@ -1,0 +1,129 @@
+{
+  "name": "DetectForge Deployed Detection Layer",
+  "versions": {
+    "attack": "14",
+    "navigator": "5.0.0",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Live MITRE ATT&CK coverage map automatically generated from deployed DetectForge Sigma rules.",
+  "filters": {
+    "platforms": [
+      "Windows",
+      "Linux",
+      "macOS"
+    ]
+  },
+  "sorting": 0,
+  "layout": {
+    "layout": "side-by-side",
+    "showID": true,
+    "showName": true,
+    "showAggregateScores": true,
+    "countUnscored": false
+  },
+  "gradient": {
+    "colors": [
+      "#ffe6e6",
+      "#66ff66",
+      "#00b300"
+    ],
+    "minValue": 0,
+    "maxValue": 5
+  },
+  "legendItems": [],
+  "showTacticRowBackground": false,
+  "tacticRowBackground": "#dddddd",
+  "selectTechniquesAcrossTactics": true,
+  "selectSubtechniquesWithParent": false,
+  "techniques": [
+    {
+      "techniqueID": "T1027",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): Certutil Used to Decode a Base64 Encoded File",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1059.003",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): Suspicious Command Shell Invocation Directly From Explorer",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1003.001",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): LSASS Memory Dump via ProcDump-Style Command Line",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1204.002",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): Office Application Spawning Script Interpreter",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1059.001",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): Suspicious PowerShell Encoded Command Execution",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1021.001",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): RDP Client Launched Against a Domain Controller",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1112",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): Registry Modification of SecurityHealth Startup Entry",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1547.001",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): Persistence via Registry Run Key Addition",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1053.005",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): Suspicious Scheduled Task Creation via Schtasks",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1082",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): System Information Discovery via systeminfo.exe",
+      "enabled": true,
+      "metadata": []
+    },
+    {
+      "techniqueID": "T1548.002",
+      "score": 1,
+      "color": "#66ff66",
+      "comment": "Detected by 1 rule(s): UAC Bypass via Event Viewer Registry Hijack",
+      "enabled": true,
+      "metadata": []
+    }
+  ]
+}
