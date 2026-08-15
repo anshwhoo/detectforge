@@ -72,6 +72,12 @@ jobs:
           GH_TOKEN: ${{ secrets.CD_ADMIN_PAT }}
         run: |
           git add -f config/attack_coverage_layer.json
+          # generate_attack_layer.py also appends today's real coverage snapshot to this
+          # file (for the Overview tab's growth-trend chart), but it was never staged
+          # here - so every snapshot it wrote was silently discarded when the runner's
+          # ephemeral checkout was torn down at the end of the job, and the chart never
+          # advanced past its original 4 manually-seeded data points.
+          git add dashboard/public/data/coverage_history.json
           $changes = git diff --cached --name-only
           if (-not $changes) {
             Write-Output "No changes to ATT&CK coverage layer, skipping commit."
