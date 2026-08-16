@@ -5,6 +5,7 @@ import RulesTab from './components/RulesTab';
 import AttackCoverageTab from './components/AttackCoverageTab';
 import PipelineActivityTab from './components/PipelineActivityTab';
 import MonitoringTab from './components/MonitoringTab';
+import ControlPanelTab from './components/ControlPanelTab';
 import { formatTimestamp } from './utils/formatters';
 
 export default function App() {
@@ -87,6 +88,7 @@ export default function App() {
         )}
         {activeTab === 'pipeline' && <PipelineActivityTab runs={pipelineRuns} />}
         {activeTab === 'monitoring' && <MonitoringTab />}
+        {activeTab === 'control-panel' && <ControlPanelTab />}
       </main>
 
       <footer className="border-t border-slate-900 bg-slate-950 text-slate-600 text-xs py-4 px-8 text-center font-mono">
