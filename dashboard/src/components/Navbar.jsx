@@ -6,7 +6,8 @@ export default function Navbar({ activeTab, setActiveTab, onRefresh, lastUpdated
     { id: 'rules', label: 'Rules' },
     { id: 'coverage', label: 'ATT&CK Coverage' },
     { id: 'pipeline', label: 'Pipeline Activity' },
-    { id: 'monitoring', label: 'Monitoring' }
+    { id: 'monitoring', label: 'Monitoring' },
+    ...(import.meta.env.VITE_ENABLE_CONTROL_PANEL === 'true' ? [{ id: 'control-panel', label: 'Control Panel' }] : [])
   ];
 
   return (
