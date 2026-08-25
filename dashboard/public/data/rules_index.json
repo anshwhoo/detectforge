@@ -1,5 +1,101 @@
 [
   {
+    "title": "Certutil Used to Decode a Base64 Encoded File",
+    "id": "728bdd79-66cd-4049-ae7c-0504a4f5ad1d",
+    "level": "high",
+    "tags": [
+      "attack.defense_evasion",
+      "attack.t1027"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Certutil's legitimate certificate-management usage does not use -decode, so false positives from normal PKI operations are unlikely"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_certutil_decode.yml",
+    "description": "Detects use of the built-in certutil.exe LOLBin with the -decode flag, a well-known technique for reconstructing an encoded payload on disk while evading naive AV signature checks.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1027/"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "Suspicious Command Shell Invocation Directly From Explorer",
+    "id": "319f9abc-4654-4139-95ba-34007fee33cc",
+    "level": "medium",
+    "tags": [
+      "attack.execution",
+      "attack.t1059.003"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Power users who manually type chained commands into an already-open shell (rare from Explorer specifically)"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_cmd_shell_from_explorer.yml",
+    "description": "Detects cmd.exe launched directly by explorer.exe with a /c command chain, which is unusual since a normal double-click open of Command Prompt starts an interactive shell with no arguments.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1059/003/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1059.003/T1059.003.md"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "LSASS Memory Dump via ProcDump-Style Command Line",
+    "id": "2cae0c52-7a3e-4c9c-b50e-bff637e96cdd",
+    "level": "critical",
+    "tags": [
+      "attack.credential_access",
+      "attack.t1003.001"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Authorized incident-response or forensic memory captures performed by security staff"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_lsass_memory_dump.yml",
+    "description": "Detects a command line referencing lsass.exe together with a -ma (full memory dump) style flag, consistent with using ProcDump or similar tools to dump LSASS memory for offline credential extraction.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1003/001/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.001/T1003.001.md"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "Office Application Spawning Script Interpreter",
+    "id": "94d998de-f355-4234-bd78-5a4f33501493",
+    "level": "high",
+    "tags": [
+      "attack.execution",
+      "attack.t1204.002"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Legitimate internally-developed mail-merge or document-automation macros that intentionally invoke a script engine (rare, should be allowlisted by specific script path)"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_office_spawn_script_interpreter.yml",
+    "description": "Detects a Microsoft Office application (Word, Excel, PowerPoint) spawning a script interpreter or shell, commonly seen in malicious macro execution chains such as the OSTap/TrickBot downloader pattern.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1204/002/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1204.002/T1204.002.md",
+      "https://www.computerweekly.com/news/252470091/TrickBot-Trojan-switches-to-stealthy-Ostap-downloader"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
     "title": "Suspicious PowerShell Encoded Command Execution",
     "id": "c8b31a89-2917-4d92-93d3-0570b5550a18",
     "level": "high",
@@ -20,6 +116,176 @@
     "references": [
       "https://attack.mitre.org/techniques/T1059/001/",
       "https://github.com/OTRF/Security-Datasets"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "RDP Client Launched Against a Domain Controller",
+    "id": "f3c01f54-da95-4630-b5ec-041185eddff8",
+    "level": "medium",
+    "tags": [
+      "attack.lateral_movement",
+      "attack.t1021.001"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Domain administrators and IT staff legitimately RDP into domain controllers for routine maintenance - tune the hostname pattern to your environment's actual DC naming convention and consider allowlisting known admin accounts"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_rdp_to_domain_controller.yml",
+    "description": "Detects mstsc.exe (Remote Desktop client) launched with a target hostname matching common domain-controller naming conventions, which is unusual for a regular workstation user and may indicate lateral movement toward high-value infrastructure.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1021/001/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1021.001/T1021.001.md"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "Registry Modification of SecurityHealth Startup Entry",
+    "id": "ab1a307b-d5a7-436d-93c2-914afa94a8fa",
+    "level": "high",
+    "tags": [
+      "attack.defense_evasion",
+      "attack.t1112"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "None expected - legitimate software has no reason to modify this specific value"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_registry_modify_securityhealth.yml",
+    "description": "Detects reg.exe adding a value to the SecurityHealth autostart entry, which attackers abuse to replace the Windows Security notification binary with an arbitrary executable.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1112/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1112/T1112.md"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "Persistence via Registry Run Key Addition",
+    "id": "52c4f0e6-f322-4bb1-ae61-68b86bdabd64",
+    "level": "medium",
+    "tags": [
+      "attack.persistence",
+      "attack.t1547.001"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Legitimate software installers registering an autostart entry for a user-approved application"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_registry_run_key_persistence.yml",
+    "description": "Detects use of reg.exe to add a new value under the CurrentVersion\\Run registry key, a common technique for establishing autostart persistence.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1547/001/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1547.001/T1547.001.md"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "Suspicious Scheduled Task Creation via Schtasks",
+    "id": "5cc899d7-1476-415f-b4b7-760d7cdffec7",
+    "level": "medium",
+    "tags": [
+      "attack.persistence",
+      "attack.t1053.005"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Legitimate administrative software deployment scripts"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_scheduled_task_creation.yml",
+    "description": "Detects creation of a scheduled task via schtasks.exe, which is commonly used by adversaries for persistence.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1053/005/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1053.005/T1053.005.md"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "System Information Discovery via systeminfo.exe",
+    "id": "f78ead59-cf2b-49c7-bb25-053da0ff0fc5",
+    "level": "low",
+    "tags": [
+      "attack.discovery",
+      "attack.t1082"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Legitimate IT inventory, asset-management, and monitoring agents routinely call systeminfo.exe - this rule cannot distinguish that from adversary recon by process creation alone"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_systeminfo_discovery.yml",
+    "description": "Detects execution of the built-in systeminfo.exe utility, commonly used by adversaries during the discovery phase to profile a compromised host. Note this is an inherently noisy indicator on its own - IT inventory tools and admin scripts also call systeminfo routinely, so this should be correlated with other signals in production rather than alerted on standalone.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1082/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1082/T1082.md"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "UAC Bypass via Event Viewer Registry Hijack",
+    "id": "0fcd46fe-a930-48da-be89-c58604f869aa",
+    "level": "high",
+    "tags": [
+      "attack.privilege_escalation",
+      "attack.defense_evasion",
+      "attack.t1548.002"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Legitimate registry management tooling that happens to touch the mscfile class (extremely rare)"
+    ],
+    "file_path": "rules/windows/process_creation/proc_creation_win_uac_bypass_eventvwr.yml",
+    "description": "Detects the classic fileless UAC bypass technique that hijacks the mscfile registry class handler (used by eventvwr.msc) to launch an attacker-controlled binary with elevated privileges.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1548/002/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1548.002/T1548.002.md",
+      "https://enigma0x3.net/2016/08/15/fileless-uac-bypass-using-eventvwr-exe-and-registry-hijacking/"
+    ],
+    "author": "DetectForge Team"
+  },
+  {
+    "title": "Suspicious Windows Command Shell Redirection Chaining",
+    "id": "0b914660-40ff-42f7-9ed9-a3b23442c124",
+    "level": "medium",
+    "tags": [
+      "attack.execution",
+      "attack.t1059.003"
+    ],
+    "logsource": {
+      "category": "process_creation",
+      "product": "windows"
+    },
+    "status": "experimental",
+    "falsepositives": [
+      "Legitimate batch scripts that redirect output to a file and then chain a follow-up command"
+    ],
+    "file_path": "rules/windows/process_creation/proc_windows_command_shell.yml",
+    "description": "Detects cmd.exe invoked with an output-redirection-then-chained-read pattern (write a file, then immediately display it in the same command line), a shape often seen when a command shell is used to stage or verify dropped content.",
+    "references": [
+      "https://attack.mitre.org/techniques/T1059/003/",
+      "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1059.003/T1059.003.md"
     ],
     "author": "DetectForge Team"
   }
