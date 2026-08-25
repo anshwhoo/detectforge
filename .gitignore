@@ -38,6 +38,10 @@ ehthumbs.db
 .env.*.local
 *.pem
 *.key
+control-panel-backend/.token
+
+# ===== Local tooling config =====
+.claude/
 
 # ===== Docker =====
 lab/data/
