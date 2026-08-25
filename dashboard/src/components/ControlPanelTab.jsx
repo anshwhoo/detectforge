@@ -350,6 +350,7 @@ tags:
       setCapturedEvents(res.events || []);
       setTerminalLogs((prev) => [...prev, `[+] Live Capture stopped. Fetched ${res.events?.length || 0} matching Sysmon event(s).`]);
     } catch (err) {
+      setIsCapturing(false);
       alert(`Stop capture failed: ${err.message}`);
     } finally {
       setLoadingAction(null);

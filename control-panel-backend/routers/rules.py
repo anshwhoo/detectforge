@@ -281,45 +281,109 @@ def capture_stop(req: CaptureStopRequest):
         }
         return {"status": "success", "events": [mock_event]}
 
+    # start_time is produced by datetime.utcnow() (naive, no offset marker). It must be
+    # parsed as UTC explicitly - otherwise .NET's DateTime.Parse treats the unspecified
+    # Kind as local time, skewing the query window by the machine's UTC offset.
+    #
+    # Get-WinEvent -FilterHashtable silently ignores the StartTime predicate on this
+    # provider when combined with Id (confirmed empirically: a "last 5 seconds" query
+    # returned every Id=1 event still in the circular buffer - over 2 hours of history -
+    # and took ~22s doing a full-log scan). So the time window is applied client-side
+    # instead: pull the most recent events by Id alone (fast - MaxEvents short-circuits
+    # the scan) and filter by TimeCreated in PowerShell. TimeCreated comes back as local
+    # Kind, so it's converted to UTC before comparing against $startTime.
+    #
+    # On this ACL-restricted channel, Get-WinEvent -FilterHashtable does NOT throw when
+    # the calling token lacks read access (only the bare -LogName form does) - it just
+    # returns "No events were found", identical to a genuinely empty capture window. So
+    # whenever the real query comes back empty, a canary FilterHashtable read (no time/Id
+    # filter) is used to tell a real empty window apart from a silently permission-blocked
+    # one before reporting success.
     ps_cmd = f"""
     try {{
-        $startTime = [DateTime]::Parse('{req.start_time}')
-        $events = Get-WinEvent -FilterHashtable @{{LogName='Microsoft-Windows-Sysmon/Operational'; Id=1; StartTime=$startTime}} -ErrorAction SilentlyContinue
+        $utcStyle = [System.Globalization.DateTimeStyles]::AssumeUniversal -bor [System.Globalization.DateTimeStyles]::AdjustToUniversal
+        $startTime = [DateTime]::Parse('{req.start_time}', [System.Globalization.CultureInfo]::InvariantCulture, $utcStyle)
         $results = @()
-        foreach ($evt in $events) {{
-            $xml = [xml]$evt.ToXml()
-            $eventData = @{{}}
-            foreach ($data in $xml.Event.EventData.Data) {{
-                if ($data.Name) {{
-                    $eventData[$data.Name] = $data.'#text'
+        $queryError = $null
+        try {{
+            $recent = Get-WinEvent -FilterHashtable @{{LogName='Microsoft-Windows-Sysmon/Operational'; Id=1}} -MaxEvents 500 -ErrorAction Stop
+            $events = $recent | Where-Object {{ $_.TimeCreated.ToUniversalTime() -ge $startTime }}
+            foreach ($evt in $events) {{
+                $xml = [xml]$evt.ToXml()
+                $eventData = @{{}}
+                foreach ($data in $xml.Event.EventData.Data) {{
+                    if ($data.Name) {{
+                        $eventData[$data.Name] = $data.'#text'
+                    }}
+                }}
+                $results += @{{
+                    metadata = @{{
+                        source = "Local-Sysmon-Live-Capture"
+                        captured_at = $evt.TimeCreated.ToString("yyyy-MM-dd HH:mm:ss")
+                    }}
+                    event = @{{
+                        EventID = [int]$evt.Id
+                        Channel = $evt.LogName
+                        EventData = $eventData
+                    }}
                 }}
             }}
-            $results += @{{
-                metadata = @{{
-                    source = "Local-Sysmon-Live-Capture"
-                    captured_at = $evt.TimeCreated.ToString("yyyy-MM-dd HH:mm:ss")
-                }}
-                event = @{{
-                    EventID = [int]$evt.Id
-                    Channel = $evt.LogName
-                    EventData = $eventData
-                }}
+        }} catch {{
+            $queryError = $_.Exception.Message
+        }}
+
+        if ($queryError -and $queryError -notmatch 'No events were found') {{
+            @{{ ok = $false; error = $queryError }} | ConvertTo-Json
+            return
+        }}
+
+        if ($results.Count -eq 0) {{
+            # -ListLog's RecordCount is itself gated by the same restrictive ACL and comes
+            # back blank under a non-elevated token, so it cannot be used to confirm the
+            # channel has data. Instead, an unfiltered FilterHashtable canary (no Id/Start
+            # Time) is the signal: if it can't read a single event via this query form even
+            # with no restriction at all, that is permission blackout regardless of record
+            # count - a channel this machine actively writes to (confirmed separately) does
+            # not go genuinely empty by chance.
+            $canary = $null
+            try {{
+                $canary = Get-WinEvent -FilterHashtable @{{LogName='Microsoft-Windows-Sysmon/Operational'}} -MaxEvents 1 -ErrorAction Stop
+            }} catch {{}}
+            if (-not $canary) {{
+                @{{ ok = $false; error = "PERMISSION_BLACKOUT: FilterHashtable cannot read any event from Microsoft-Windows-Sysmon/Operational under the current account token" }} | ConvertTo-Json
+                return
             }}
         }}
-        $results | ConvertTo-Json -Depth 5
+
+        @{{ ok = $true; results = $results }} | ConvertTo-Json -Depth 5
     }} catch {{
-        Write-Output "[]"
+        @{{ ok = $false; error = $_.Exception.Message }} | ConvertTo-Json
     }}
     """
     try:
         res = subprocess.run(["powershell", "-Command", ps_cmd], capture_output=True, text=True, timeout=15)
         raw_out = res.stdout.strip()
-        parsed = json.loads(raw_out) if raw_out else []
-        if isinstance(parsed, dict):
-            parsed = [parsed]
-        return {"status": "success", "events": parsed}
+        parsed = json.loads(raw_out) if raw_out else {"ok": False, "error": "No output from capture query"}
+
+        if not parsed.get("ok"):
+            error_msg = parsed.get("error", "Unknown error")
+            if "PERMISSION_BLACKOUT" in error_msg or "unauthorized operation" in error_msg.lower() or "access is denied" in error_msg.lower():
+                raise HTTPException(
+                    status_code=403,
+                    detail="Access denied reading the Sysmon event log. Your account needs to be in the local "
+                           "'Event Log Readers' group (run as Administrator: "
+                           "net localgroup \"Event Log Readers\" \"%USERNAME%\" /add), then sign out and back in."
+                )
+            raise HTTPException(status_code=500, detail=f"Capture query failed: {error_msg}")
+
+        events = parsed.get("results", [])
+        if isinstance(events, dict):
+            events = [events]
+        return {"status": "success", "events": events}
+    except HTTPException:
+        raise
     except Exception as e:
-        return {"status": "error", "message": str(e), "events": []}
+        raise HTTPException(status_code=500, detail=f"Capture stop failed: {e}")
 
 @router.post("/generate-boundary-variant", dependencies=[Depends(verify_token)])
 def generate_boundary_variant(req: BoundaryVariantRequest):
